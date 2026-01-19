@@ -8,7 +8,11 @@ import viteTsConfigPaths from "vite-tsconfig-paths";
 
 const config = defineConfig({
   plugins: [
-    // this is the plugin that enables path aliases
+    cloudflare({
+      viteEnvironment: {
+        name: "ssr",
+      },
+    }),
     viteTsConfigPaths({
       projects: ["./tsconfig.json"],
     }),
@@ -16,11 +20,6 @@ const config = defineConfig({
     devtools(),
     tanstackStart(),
     viteReact(),
-    cloudflare({
-      viteEnvironment: {
-        name: "ssr",
-      },
-    }),
   ],
 });
 
