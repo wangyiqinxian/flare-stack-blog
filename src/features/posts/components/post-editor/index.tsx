@@ -377,33 +377,53 @@ export function PostEditor({ initialData, onSave }: PostEditorProps) {
         </div>
       </div>
 
-      {/* Fixed Terminal Status Bar */}
-      <div className="fixed bottom-0 inset-x-0 h-8 bg-black text-white z-50 flex items-center justify-between px-4 text-[10px] font-mono uppercase tracking-widest border-t border-white/20">
-        <div className="flex items-center gap-6">
+      {/* Minimalist Status Bar */}
+      <div className="fixed bottom-0 inset-x-0 h-8 bg-background/80 backdrop-blur-md border-t border-border/40 z-50 flex items-center justify-between px-6 text-[10px] font-mono select-none">
+        <div className="flex items-center gap-6 text-muted-foreground">
           <div className="flex items-center gap-2">
-            <span className="opacity-50">字符:</span>
-            <span>{JSON.stringify(post.contentJson || "").length}</span>
+            <span>字符</span>
+            <span className="text-foreground">
+              {JSON.stringify(post.contentJson || "").length}
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="opacity-50">单词:</span>
-            <span>
+            <span>词数</span>
+            <span className="text-foreground">
               {Math.ceil(JSON.stringify(post.contentJson || "").length / 5)}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           {saveStatus === "ERROR" ? (
-            <span className="text-red-500 font-bold">保存失败</span>
+            <span className="text-red-500 font-medium flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+              保存失败
+            </span>
           ) : saveStatus === "SAVING" ? (
-            <span className="animate-pulse">保存中...</span>
+            <span className="text-muted-foreground flex items-center gap-2">
+              <Loader2 className="animate-spin w-2.5 h-2.5" />
+              保存中...
+            </span>
           ) : saveStatus === "PENDING" ? (
-            <span className="text-amber-500">有未保存更改</span>
+            <span className="text-amber-500/80 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              未保存
+            </span>
           ) : (
-            <span className="text-emerald-500">
-              {lastSaved
-                ? `已保存 ${lastSaved.toLocaleTimeString([], { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
-                : "已同步"}
+            <span className="text-muted-foreground/60 flex items-center gap-2 transition-opacity duration-300">
+              {lastSaved ? (
+                <>
+                  已保存{" "}
+                  {lastSaved.toLocaleTimeString([], {
+                    hour12: false,
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </>
+              ) : (
+                "已同步"
+              )}
             </span>
           )}
         </div>
