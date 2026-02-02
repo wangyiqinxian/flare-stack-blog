@@ -1,0 +1,127 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-blog",
+  "compatibility_date": "2025-10-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "./src/server.ts",
+  "observability": {
+    "enabled": true,
+  },
+  "routes": [
+    {
+      "pattern": "cfblog.999183.xyz",
+      "custom_domain": true,
+    },
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_id": "345ba86a-0049-485f-826b-175dac6477a4",
+      "migrations_dir": "migrations",
+      "remote": true,
+    },
+  ],
+  "r2_buckets": [
+    {
+      "bucket_name": "flare-stack-blog",
+      "binding": "R2",
+      "remote": true,
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "8cbece18d04a4dc086fd6186b33557f2",
+      "remote": true,
+    },
+  ],
+  "workflows": [
+    {
+      "name": "post-process-workflow",
+      "binding": "POST_PROCESS_WORKFLOW",
+      "class_name": "PostProcessWorkflow",
+    },
+    {
+      "name": "comment-moderation-workflow",
+      "binding": "COMMENT_MODERATION_WORKFLOW",
+      "class_name": "CommentModerationWorkflow",
+    },
+    {
+      "name": "send-email-workflow",
+      "binding": "SEND_EMAIL_WORKFLOW",
+      "class_name": "SendEmailWorkflow",
+    },
+    {
+      "name": "scheduled-publish-workflow",
+      "binding": "SCHEDULED_PUBLISH_WORKFLOW",
+      "class_name": "ScheduledPublishWorkflow",
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "RATE_LIMITER",
+        "class_name": "RateLimiter",
+      },
+    ],
+  },
+  "ai": {
+    "binding": "AI",
+    "remote": true,
+  },
+  "migrations": [
+    {
+      "tag": "rate-limiter-v1",
+      "new_sqlite_classes": ["RateLimiter"],
+    },
+  ],
+  "env": {
+    "test": {
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "RATE_LIMITER",
+            "class_name": "RateLimiter",
+          },
+        ],
+      },
+      "kv_namespaces": [
+        {
+          "binding": "KV",
+        },
+      ],
+      "r2_buckets": [
+        {
+          "binding": "R2",
+        },
+      ],
+      "d1_databases": [
+        {
+          "binding": "DB",
+        },
+      ],
+      "workflows": [
+        {
+          "name": "post-process-workflow",
+          "binding": "POST_PROCESS_WORKFLOW",
+          "class_name": "PostProcessWorkflow",
+        },
+        {
+          "name": "comment-moderation-workflow",
+          "binding": "COMMENT_MODERATION_WORKFLOW",
+          "class_name": "CommentModerationWorkflow",
+        },
+        {
+          "name": "send-email-workflow",
+          "binding": "SEND_EMAIL_WORKFLOW",
+          "class_name": "SendEmailWorkflow",
+        },
+        {
+          "name": "scheduled-publish-workflow",
+          "binding": "SCHEDULED_PUBLISH_WORKFLOW",
+          "class_name": "ScheduledPublishWorkflow",
+        },
+      ],
+    },
+  },
+}
