@@ -9,21 +9,21 @@
   },
   "routes": [
     {
-      "pattern": "DOMAIN_PLACEHOLDER",
+      "pattern": "cfblog.999183.xyz",
       "custom_domain": true,
     },
   ],
   "d1_databases": [
     {
       "binding": "DB",
-      "database_id": "D1_DATABASE_ID",
+      "database_id": "accdee00-03fa-4c69-ae38-2247c3055edb",
       "migrations_dir": "migrations",
       "remote": true,
     },
   ],
   "r2_buckets": [
     {
-      "bucket_name": "bucket-name-placeholder",
+      "bucket_name": "flare-stack-blog",
       "binding": "R2",
       "remote": true,
     },
@@ -31,7 +31,7 @@
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "KV_NAMESPACE_ID",
+      "id": "11993a581c1d42278f012edc51021851",
       "remote": true,
     },
   ],
