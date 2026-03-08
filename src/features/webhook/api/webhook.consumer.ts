@@ -100,9 +100,16 @@ export async function sendWebhookRequest(
   });
 
   if (!response.ok) {
-    throw new Error(
-      `webhook delivery failed: ${response.status} ${response.statusText}`,
-    );
+    let errorDetail = "";
+    try {
+      errorDetail = await response.text();
+    } catch {
+      // Ignored
+    }
+
+    const errorMessage = `Webhook delivery failed: ${response.status} ${response.statusText}${errorDetail ? ` - ${errorDetail.slice(0, 1000)}` : ""}`;
+
+    throw new Error(errorMessage);
   }
 }
 

@@ -74,8 +74,12 @@ export function WebhookSettingsSection() {
         },
       });
       toast.success("测试请求已发送");
-    } catch {
-      toast.error("测试请求发送失败");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(`测试请求发送失败: ${error.message}`);
+      } else {
+        toast.error("测试请求发送失败");
+      }
     }
   };
 
