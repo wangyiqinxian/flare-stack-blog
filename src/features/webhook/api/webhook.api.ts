@@ -4,7 +4,10 @@ import { adminMiddleware } from "@/lib/middlewares";
 import { webhookEndpointSchema } from "@/features/webhook/webhook.schema";
 import { NOTIFICATION_EVENT } from "@/features/notification/notification.schema";
 import { sendWebhookRequest } from "@/features/webhook/api/webhook.consumer";
-import { createNotificationExampleEvent } from "@/features/webhook/webhook.helpers";
+import {
+  WEBHOOK_EXAMPLE_LABELS,
+  createNotificationExampleEvent,
+} from "@/features/webhook/webhook.helpers";
 
 const testWebhookInputSchema = z.object({
   endpoint: webhookEndpointSchema,
@@ -26,7 +29,10 @@ export const testWebhookFn = createServerFn({
         endpointId: data.endpoint.id,
         url: data.endpoint.url,
         secret: data.endpoint.secret,
-        event: createNotificationExampleEvent(resolvedEventType),
+        event: createNotificationExampleEvent(
+          resolvedEventType,
+          (k) => WEBHOOK_EXAMPLE_LABELS[k],
+        ),
       },
       crypto.randomUUID(),
       {

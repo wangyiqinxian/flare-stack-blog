@@ -19,6 +19,25 @@ export type WebhookTranslationKey =
   | "subject"
   | "message";
 
+export const WEBHOOK_EXAMPLE_LABELS: Record<WebhookTranslationKey, string> = {
+  admin_email: "admin@example.com",
+  post_title: "欢迎使用通知系统",
+  commenter_name: "测试用户",
+  comment_preview: "这是一条用于校验 Webhook 链路的测试评论。",
+  review_url: "https://example.com/admin/comments",
+  comment_url: "https://example.com/posts/welcome#comments",
+  unsubscribe_url: "https://example.com/unsubscribe?token=test",
+  replier_name: "测试用户",
+  reply_preview: "这是一条用于检查回复通知的测试内容。",
+  site_name: "测试站点",
+  site_url: "https://example.com",
+  description: "这是一个用于测试 Webhook 通知的示例友链申请。",
+  submitter_name: "测试用户",
+  friend_link_review_url: "https://example.com/admin/friend-links",
+  subject: "[新评论] 欢迎使用通知系统",
+  message: "测试用户在《欢迎使用通知系统》下发表了评论：这是一条示例评论。",
+};
+
 export function createNotificationExampleEvent(
   eventType: NotificationWebhookEventType,
   t: (key: WebhookTranslationKey) => string = (k) => k,
