@@ -32,8 +32,8 @@ export function handleServerError(error: unknown): void {
       break;
     }
     case "UNKNOWN":
-      toast.error("请求失败", {
-        description: "发生了未预期的错误，请稍后重试",
+      toast.error("发生了未预期的错误", {
+        description: parsed.message,
       });
       break;
     default:

@@ -42,7 +42,10 @@ export async function checkForUpdate(
     );
 
     if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.statusText}`);
+      const body = await response.text().catch(() => "");
+      throw new Error(
+        `GitHub API error: ${response.status} ${response.statusText}${body ? ` - ${body.slice(0, 500)}` : ""}`,
+      );
     }
 
     const json = await response.json();
