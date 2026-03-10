@@ -7,6 +7,15 @@ export const Route = createFileRoute("/robots.txt")({
         const robots = `User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /search
+Disallow: /unsubscribe
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /verify-email
+Disallow: /reset-link
+Disallow: /profile
+Disallow: /submit-friend-link
 Sitemap: https://${env.DOMAIN}/sitemap.xml`;
 
         return new Response(robots, {

@@ -4,6 +4,8 @@
 // Pre-compiled Regexes for maximum performance on Cloudflare Workers
 export const ROUTE_REGEXPS: Array<RegExp> = [
   new RegExp("^/admin/?$"),
+  new RegExp("^/atom\\.xml/?$"),
+  new RegExp("^/feed\\.json/?$"),
   new RegExp("^/robots\\.txt/?$"),
   new RegExp("^/rss\\.xml/?$"),
   new RegExp("^/sitemap\\.xml/?$"),

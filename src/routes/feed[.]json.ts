@@ -1,15 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { buildFeed } from "@/features/posts/utils/feed";
 
-export const Route = createFileRoute("/rss.xml")({
+export const Route = createFileRoute("/feed.json")({
   server: {
     handlers: {
       GET: async ({ context: { env } }) => {
         const feed = await buildFeed(env);
 
-        return new Response(feed.rss2(), {
+        return new Response(feed.json1(), {
           headers: {
-            "Content-Type": "application/rss+xml; charset=utf-8",
+            "Content-Type": "application/feed+json; charset=utf-8",
             "Cache-Control": "public, max-age=3600, s-maxage=3600",
           },
         });

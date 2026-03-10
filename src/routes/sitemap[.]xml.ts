@@ -42,6 +42,11 @@ export const Route = createFileRoute("/sitemap.xml")({
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://${env.DOMAIN}/friend-links</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
   ${posts
     .map(
       (post) => `

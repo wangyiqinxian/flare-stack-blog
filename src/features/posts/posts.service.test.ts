@@ -302,6 +302,34 @@ describe("PostService", () => {
       expect(result.items[0].title).toBe("TypeScript Post");
     });
 
+    it("should show post whose publishedAt is today (UTC) even if stored time is later in the day", async () => {
+      const publicContext = createTestContext();
+
+      // Simulate the editor bug scenario: user selects "today" which stores as noon UTC
+      // (new Date(`${dateStr}T12:00:00Z`)), but current UTC time may be before noon.
+      // We use end-of-day to reliably ensure the stored time is "future" within today.
+      const todayUTC = new Date().toISOString().slice(0, 10);
+      const endOfTodayUTC = new Date(`${todayUTC}T23:59:59Z`);
+
+      const { id } = await PostService.createEmptyPost(adminContext);
+      await updatePost({
+        id,
+        data: {
+          title: "Today Post",
+          slug: "today-post",
+          status: "published",
+          publishedAt: endOfTodayUTC,
+        },
+      });
+
+      const result = await PostService.getPostsCursor(publicContext, {});
+
+      // Should be visible because the publishedAt DATE equals today,
+      // even though the stored time (23:59:59Z) is technically in the future
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].title).toBe("Today Post");
+    });
+
     it("should return empty when no posts match tag", async () => {
       const publicContext = createTestContext();
 

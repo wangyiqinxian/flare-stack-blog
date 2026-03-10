@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as FeedDotjsonRouteImport } from './routes/feed[.]json'
+import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as UserRouteRouteImport } from './routes/_user/route'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
@@ -52,6 +54,16 @@ const RssDotxmlRoute = RssDotxmlRouteImport.update({
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   id: '/robots.txt',
   path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedDotjsonRoute = FeedDotjsonRouteImport.update({
+  id: '/feed.json',
+  path: '/feed.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtomDotxmlRoute = AtomDotxmlRouteImport.update({
+  id: '/atom.xml',
+  path: '/atom.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -184,6 +196,8 @@ const AdminPostsEditIdRoute = AdminPostsEditIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
+  '/atom.xml': typeof AtomDotxmlRoute
+  '/feed.json': typeof FeedDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -211,6 +225,8 @@ export interface FileRoutesByFullPath {
   '/admin/posts/edit/$id': typeof AdminPostsEditIdRoute
 }
 export interface FileRoutesByTo {
+  '/atom.xml': typeof AtomDotxmlRoute
+  '/feed.json': typeof FeedDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -242,6 +258,8 @@ export interface FileRoutesById {
   '/_public': typeof PublicRouteRouteWithChildren
   '/_user': typeof UserRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
+  '/atom.xml': typeof AtomDotxmlRoute
+  '/feed.json': typeof FeedDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -272,6 +290,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/admin'
+    | '/atom.xml'
+    | '/feed.json'
     | '/robots.txt'
     | '/rss.xml'
     | '/sitemap.xml'
@@ -299,6 +319,8 @@ export interface FileRouteTypes {
     | '/admin/posts/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/atom.xml'
+    | '/feed.json'
     | '/robots.txt'
     | '/rss.xml'
     | '/sitemap.xml'
@@ -329,6 +351,8 @@ export interface FileRouteTypes {
     | '/_public'
     | '/_user'
     | '/admin'
+    | '/atom.xml'
+    | '/feed.json'
     | '/robots.txt'
     | '/rss.xml'
     | '/sitemap.xml'
@@ -361,6 +385,8 @@ export interface RootRouteChildren {
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   UserRouteRoute: typeof UserRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  AtomDotxmlRoute: typeof AtomDotxmlRoute
+  FeedDotjsonRoute: typeof FeedDotjsonRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -387,6 +413,20 @@ declare module '@tanstack/react-router' {
       path: '/robots.txt'
       fullPath: '/robots.txt'
       preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed.json': {
+      id: '/feed.json'
+      path: '/feed.json'
+      fullPath: '/feed.json'
+      preLoaderRoute: typeof FeedDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atom.xml': {
+      id: '/atom.xml'
+      path: '/atom.xml'
+      fullPath: '/atom.xml'
+      preLoaderRoute: typeof AtomDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -673,6 +713,8 @@ const rootRouteChildren: RootRouteChildren = {
   PublicRouteRoute: PublicRouteRouteWithChildren,
   UserRouteRoute: UserRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  AtomDotxmlRoute: AtomDotxmlRoute,
+  FeedDotjsonRoute: FeedDotjsonRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   RssDotxmlRoute: RssDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
