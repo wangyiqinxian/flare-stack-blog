@@ -1,12 +1,12 @@
-import { createMiddleware } from "hono/factory";
-import { isPathValid } from "./path-manifest.generated";
 import type { Context } from "hono";
-import type { Duration } from "@/lib/duration";
-import { serverEnv } from "@/lib/env/server.env";
-import { getDb } from "@/lib/db";
+import { createMiddleware } from "hono/factory";
 import { getAuth } from "@/lib/auth/auth.server";
 import { CACHE_CONTROL } from "@/lib/constants";
+import { getDb } from "@/lib/db";
+import type { Duration } from "@/lib/duration";
+import { serverEnv } from "@/lib/env/server.env";
 import { verifyTurnstileToken } from "@/lib/turnstile";
+import { isPathValid } from "./path-manifest.generated";
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -111,7 +111,14 @@ export const rateLimitMiddleware = (options: RateLimitOptions) =>
 
     if (!result.allowed) {
       c.res.headers.set("Retry-After", result.retryAfterMs.toString());
-      return c.json({ message: "Too Many Requests" }, 429);
+      return c.json(
+        {
+          code: "RATE_LIMITED",
+          message: "Too Many Requests",
+          retryAfterMs: result.retryAfterMs,
+        },
+        429,
+      );
     }
 
     return next();
@@ -154,13 +161,25 @@ export const turnstileMiddleware = createMiddleware<{ Bindings: Env }>(
 
     const token = c.req.header("X-Turnstile-Token");
     if (!token) {
-      return c.json({ message: "Missing Turnstile token" }, 400);
+      return c.json(
+        {
+          code: "TURNSTILE_MISSING_TOKEN",
+          message: "Missing Turnstile token",
+        },
+        400,
+      );
     }
 
     const result = await verifyTurnstileToken({ secretKey, token });
 
     if (!result.success) {
-      return c.json({ message: "Turnstile verification failed" }, 403);
+      return c.json(
+        {
+          code: "TURNSTILE_VERIFICATION_FAILED",
+          message: "Turnstile verification failed",
+        },
+        403,
+      );
     }
 
     return next();

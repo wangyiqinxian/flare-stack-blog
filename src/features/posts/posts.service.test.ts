@@ -1,14 +1,16 @@
-import { beforeEach, describe, expect, it } from "vitest";
 import { env } from "cloudflare:test";
+import { eq } from "drizzle-orm";
 import {
   createAdminTestContext,
   createTestContext,
   seedUser,
   waitForBackgroundTasks,
 } from "tests/test-utils";
+import { beforeEach, describe, expect, it } from "vitest";
+import * as CacheService from "@/features/cache/cache.service";
 import * as PostService from "@/features/posts/posts.service";
 import * as TagService from "@/features/tags/tags.service";
-import * as CacheService from "@/features/cache/cache.service";
+import { PostsTable } from "@/lib/db/schema";
 import { unwrap } from "@/lib/errors";
 
 describe("PostService", () => {
@@ -84,6 +86,48 @@ describe("PostService", () => {
       expect(post).not.toBeNull();
       expect(post?.id).toBe(id);
       expect(post?.title).toBe("Public Post");
+    });
+
+    it("should backfill publicContentJson for legacy published posts on read", async () => {
+      const publicContext = createTestContext();
+      const { id } = await PostService.createEmptyPost(adminContext);
+      await updatePost({
+        id,
+        data: {
+          title: "Legacy Snapshot",
+          slug: "legacy-snapshot",
+          status: "published",
+          publishedAt: new Date(),
+          contentJson: {
+            type: "doc",
+            content: [
+              {
+                type: "codeBlock",
+                attrs: { language: "ts" },
+                content: [{ type: "text", text: "const answer = 42;" }],
+              },
+            ],
+          },
+        },
+      });
+      const beforeRead = await adminContext.db.query.PostsTable.findFirst({
+        where: eq(PostsTable.id, id),
+      });
+
+      const post = await PostService.findPostBySlug(publicContext, {
+        slug: "legacy-snapshot",
+      });
+      expect(post).not.toBeNull();
+
+      await waitForBackgroundTasks(publicContext.executionCtx);
+
+      const storedPost = await adminContext.db.query.PostsTable.findFirst({
+        where: eq(PostsTable.id, id),
+      });
+      expect(storedPost?.publicContentJson).toBeTruthy();
+      expect(storedPost?.updatedAt?.getTime()).toBe(
+        beforeRead?.updatedAt?.getTime(),
+      );
     });
 
     it("should delete a post", async () => {

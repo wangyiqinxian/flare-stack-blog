@@ -4,8 +4,8 @@ import {
   waitOnExecutionContext,
 } from "cloudflare:test";
 import { vi } from "vitest";
-import * as schema from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
+import * as schema from "@/lib/db/schema";
 
 export function createTestDb() {
   return getDb(env);
@@ -91,7 +91,7 @@ export function createTestContext(
 ) {
   const context = {
     db: createTestDb(),
-    env: env,
+    env: { ...env },
     executionCtx: createMockExecutionCtx(),
     auth: createMockAuth(),
     ...overrides,

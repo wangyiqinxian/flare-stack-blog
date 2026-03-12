@@ -29,6 +29,20 @@
       "when": 1770449895500,
       "tag": "0003_zippy_luminals",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1773271285901,
+      "tag": "0004_slim_tinkerer",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1773274477966,
+      "tag": "0005_tricky_scarlet_spider",
+      "breakpoints": true
     }
   ]
 }

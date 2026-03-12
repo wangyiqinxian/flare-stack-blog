@@ -1,4 +1,8 @@
 import { z } from "zod";
+import * as AiService from "@/features/ai/ai.service";
+import * as CacheService from "@/features/cache/cache.service";
+import { syncPostMedia } from "@/features/posts/data/post-media.data";
+import * as PostRepo from "@/features/posts/data/posts.data";
 import type {
   DeletePostInput,
   FindPostByIdInput,
@@ -12,26 +16,29 @@ import type {
   StartPostProcessInput,
   UpdatePostInput,
 } from "@/features/posts/posts.schema";
-import * as CacheService from "@/features/cache/cache.service";
-import { isFuturePublishDate } from "@/features/posts/utils/date";
-import { syncPostMedia } from "@/features/posts/data/post-media.data";
-import * as PostRepo from "@/features/posts/data/posts.data";
 import {
   POSTS_CACHE_KEYS,
   PostListResponseSchema,
   PostWithTocSchema,
 } from "@/features/posts/posts.schema";
-import * as AiService from "@/features/ai/ai.service";
-import { generateTableOfContents } from "@/features/posts/utils/toc";
 import {
   convertToPlainText,
   highlightCodeBlocks,
   slugify,
 } from "@/features/posts/utils/content";
+import { isFuturePublishDate } from "@/features/posts/utils/date";
+import { calculatePostHash } from "@/features/posts/utils/sync";
+import { generateTableOfContents } from "@/features/posts/utils/toc";
+import * as SearchService from "@/features/search/service/search.service";
 import { err, ok } from "@/lib/errors";
 import { purgePostCDNCache } from "@/lib/invalidate";
-import * as SearchService from "@/features/search/service/search.service";
-import { calculatePostHash } from "@/features/posts/utils/sync";
+
+function stripPublicContentJson<T extends { publicContentJson?: unknown }>(
+  post: T,
+): Omit<T, "publicContentJson"> {
+  const { publicContentJson: _publicContentJson, ...rest } = post;
+  return rest;
+}
 
 export async function getPostsCursor(
   context: DbContext & { executionCtx: ExecutionContext },
@@ -74,15 +81,24 @@ export async function findPostBySlug(
     });
     if (!post) return null;
 
-    let contentJson = post.contentJson;
-    if (contentJson) {
+    let contentJson = post.publicContentJson ?? post.contentJson;
+    // Backward-compatible fallback for posts that haven't been reprocessed yet.
+    // New publishes should read pre-highlighted content from `publicContentJson`.
+    if (!post.publicContentJson && contentJson) {
       contentJson = await highlightCodeBlocks(contentJson);
+      context.executionCtx.waitUntil(
+        PostRepo.updatePublicContentSnapshot(
+          context.db,
+          post.id,
+          contentJson,
+        ).then(() => undefined),
+      );
     }
 
     return {
-      ...post,
+      ...stripPublicContentJson(post),
       contentJson,
-      toc: generateTableOfContents(post.contentJson),
+      toc: generateTableOfContents(contentJson),
     };
   };
 
@@ -163,7 +179,7 @@ export async function generateSummaryByPostId({
     return err({ reason: "POST_NOT_FOUND" });
   }
 
-  return ok(updatedPost);
+  return ok(stripPublicContentJson(updatedPost));
 }
 
 // ============ Admin Service Methods ============
@@ -254,7 +270,7 @@ export async function findPostBySlugAdmin(
   });
   if (!post) return null;
   return {
-    ...post,
+    ...stripPublicContentJson(post),
     toc: generateTableOfContents(post.contentJson),
   };
 }
@@ -290,7 +306,7 @@ export async function findPostById(
     isSynced = dbHash === kvHash;
   }
 
-  return { ...post, isSynced, hasPublicCache };
+  return { ...stripPublicContentJson(post), isSynced, hasPublicCache };
 }
 
 export async function updatePost(

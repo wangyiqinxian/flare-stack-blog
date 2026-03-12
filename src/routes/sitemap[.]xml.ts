@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { and, desc, eq, lte } from "drizzle-orm";
-import { PostsTable } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
+import { PostsTable } from "@/lib/db/schema";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -64,6 +64,14 @@ export const Route = createFileRoute("/sitemap.xml")({
           headers: {
             "Content-Type": "application/xml; charset=utf-8",
             // Cache for 1 hour, allow CDN to cache
+            "Cache-Control": "public, max-age=3600, s-maxage=3600",
+          },
+        });
+      },
+      HEAD: async () => {
+        return new Response(null, {
+          headers: {
+            "Content-Type": "application/xml; charset=utf-8",
             "Cache-Control": "public, max-age=3600, s-maxage=3600",
           },
         });

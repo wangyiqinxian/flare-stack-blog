@@ -3,14 +3,15 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import theme from "@theme";
 import { useMemo } from "react";
 import { z } from "zod";
-import theme from "@theme";
-import { postsInfiniteQueryOptions } from "@/features/posts/queries";
-import { siteDomainQuery } from "@/features/config/queries";
 import { blogConfig } from "@/blog.config";
+import { siteDomainQuery } from "@/features/config/queries";
+import { postsInfiniteQueryOptions } from "@/features/posts/queries";
 import { tagsQueryOptions } from "@/features/tags/queries";
 import { buildCanonicalUrl, canonicalLink } from "@/lib/seo";
+import { m } from "@/paraglide/messages";
 
 const { postsPerPage } = theme.config.posts;
 
@@ -34,7 +35,7 @@ export const Route = createFileRoute("/_public/posts")({
     ]);
 
     return {
-      title: "全部文章",
+      title: m.posts_title(),
       canonicalHref: buildCanonicalUrl(domain, "/posts", {
         tagName: deps.tagName,
       }),

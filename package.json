@@ -1,6 +1,6 @@
 {
   "name": "flare-stack-blog",
-  "version": "0.11.3",
+  "version": "1.0.0",
   "type": "module",
   "author": {
     "email": "kuangdadu@gmail.com",
@@ -15,10 +15,13 @@
     "deploy": "bun db:migrate && wrangler deploy",
     "serve": "vite preview",
     "test": "vitest run",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "check": "tsc --noEmit && bun lint:fix && bun format",
+    "lint": "biome lint",
+    "lint:fix": "biome check --write",
+    "format": "biome format --write",
+    "typecheck": "tsc --noEmit",
+    "check": "biome check --write && bun typecheck",
+    "i18n:compile": "bun paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
+    "i18n:verify": "bun scripts/verify-translations.ts",
     "cf-typegen": "wrangler types --env-interface Env",
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
@@ -97,7 +100,7 @@
     "@fontsource-variable/noto-serif-sc": "^5.2.10",
     "@release-it/conventional-changelog": "^10.0.5",
     "@tanstack/devtools-vite": "^0.3.9",
-    "@tanstack/eslint-config": "^0.3.4",
+    "@biomejs/biome": "2.3.11",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.10.2",
@@ -105,15 +108,14 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",
     "drizzle-kit": "^0.31.5",
-    "eslint": "9.39.2",
     "jsdom": "^27.0.0",
-    "prettier": "3.7.4",
     "release-it": "^19.2.4",
     "shiki": "^3.15.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
     "vitest": "~3.2.0",
     "web-vitals": "^5.1.0",
-    "wrangler": "^4.45.0"
+    "wrangler": "^4.45.0",
+    "@inlang/paraglide-js": "^2.14.0"
   }
 }

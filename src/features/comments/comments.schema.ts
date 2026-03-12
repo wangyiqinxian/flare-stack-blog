@@ -1,11 +1,11 @@
-import { z } from "zod";
+import type { JSONContent } from "@tiptap/react";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
+import { z } from "zod";
 import type { CommentStatus } from "@/lib/db/schema";
-import type { JSONContent } from "@tiptap/react";
 import { CommentsTable } from "@/lib/db/schema";
 
 // Date fields need to accept both Date objects and ISO strings (for JSON serialization)
@@ -20,8 +20,8 @@ export const CommentUpdateSchema = createUpdateSchema(CommentsTable);
 
 // User info schema for joined queries
 export const CommentUserSchema = z.object({
-  id: z.string(),
-  name: z.string(),
+  id: z.string().nullable(),
+  name: z.string().nullable(),
   image: z.string().nullable(),
   role: z.string().nullable(),
 });
@@ -76,8 +76,8 @@ export const GetRepliesByRootIdInputSchema = z.object({
 export const ReplyWithUserAndReplyToSchema = CommentWithUserSchema.extend({
   replyTo: z
     .object({
-      id: z.string(),
-      name: z.string(),
+      id: z.string().nullable(),
+      name: z.string().nullable(),
     })
     .nullable(),
 });

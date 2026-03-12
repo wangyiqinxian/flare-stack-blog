@@ -1,17 +1,17 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import type { QueryClient } from "@tanstack/react-query";
 import {
+  createRootRouteWithContext,
   HeadContent,
   Scripts,
-  createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import type { QueryClient } from "@tanstack/react-query";
-import { ThemeProvider } from "@/components/common/theme-provider";
-
-import TanStackQueryDevtools from "@/integrations/tanstack-query/devtools";
-import appCss from "@/styles.css?url";
 import { blogConfig } from "@/blog.config";
+import { ThemeProvider } from "@/components/common/theme-provider";
+import TanStackQueryDevtools from "@/integrations/tanstack-query/devtools";
 import { clientEnv } from "@/lib/env/client.env";
+import { getLocale } from "@/paraglide/runtime";
+import appCss from "@/styles.css?url";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -101,8 +101,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const locale = getLocale();
+
   return (
-    <html lang="zh" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

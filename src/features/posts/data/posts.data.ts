@@ -11,13 +11,13 @@ import {
   sql,
 } from "drizzle-orm";
 import type { SortDirection, SortField } from "@/features/posts/data/helper";
-import type { PostStatus, Tag } from "@/lib/db/schema";
-import type { PostListItem } from "@/features/posts/posts.schema";
 import {
   buildPostOrderByClause,
   buildPostWhereClause,
 } from "@/features/posts/data/helper";
-import { PostTagsTable, PostsTable, TagsTable } from "@/lib/db/schema";
+import type { PostListItem } from "@/features/posts/posts.schema";
+import type { PostStatus, Tag } from "@/lib/db/schema";
+import { PostsTable, PostTagsTable, TagsTable } from "@/lib/db/schema";
 
 const DEFAULT_PAGE_SIZE = 12;
 
@@ -255,6 +255,22 @@ export async function updatePost(
   data: Partial<Omit<typeof PostsTable.$inferInsert, "id" | "createdAt">>,
 ) {
   await db.update(PostsTable).set(data).where(eq(PostsTable.id, id));
+  return await findPostById(db, id);
+}
+
+export async function updatePublicContentSnapshot(
+  db: DB,
+  id: number,
+  publicContentJson: typeof PostsTable.$inferInsert.publicContentJson,
+) {
+  await db
+    .update(PostsTable)
+    .set({
+      publicContentJson,
+      // Snapshot rebuilds should not affect editorial ordering/history.
+      updatedAt: sql`${PostsTable.updatedAt}`,
+    })
+    .where(eq(PostsTable.id, id));
   return await findPostById(db, id);
 }
 

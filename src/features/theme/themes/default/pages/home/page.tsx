@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Github, Mail, Rss, Terminal } from "lucide-react";
-import type { HomePageProps } from "@/features/theme/contract/pages";
 import { blogConfig } from "@/blog.config";
+import type { HomePageProps } from "@/features/theme/contract/pages";
 import { PostItem } from "@/features/theme/themes/default/components/post-item";
+import { m } from "@/paraglide/messages";
 
 export function HomePage({ posts }: HomePageProps) {
   return (
@@ -11,16 +12,18 @@ export function HomePage({ posts }: HomePageProps) {
       <section className="space-y-8">
         <header className="space-y-6">
           <h1 className="text-4xl md:text-5xl font-serif font-medium tracking-tight text-foreground flex items-center gap-4">
-            你好 <span className="animate-wave origin-[70%_70%]">👋</span>
+            {m.home_greeting()}{" "}
+            <span className="animate-wave origin-[70%_70%]">👋</span>
           </h1>
 
           <div className="space-y-4 max-w-2xl text-base md:text-lg text-muted-foreground font-light leading-relaxed">
             <p>
-              我是{" "}
+              {m.home_intro_prefix()}{" "}
               <span className="text-foreground font-medium">
                 {blogConfig.author}
               </span>
-              ，{blogConfig.description}
+              {m.home_intro_separator()}
+              {blogConfig.description}
             </p>
           </div>
         </header>
@@ -40,14 +43,14 @@ export function HomePage({ posts }: HomePageProps) {
             target="_blank"
             className="hover:text-foreground transition-colors"
             rel="noreferrer"
-            aria-label="RSS 订阅"
+            aria-label={m.rss_subscription()}
           >
             <Rss size={20} strokeWidth={1.5} />
           </a>
           <a
             href={`mailto:${blogConfig.social.email}`}
             className="hover:text-foreground transition-colors"
-            aria-label="发送邮件"
+            aria-label={m.send_email()}
           >
             <Mail size={20} strokeWidth={1.5} />
           </a>
@@ -57,7 +60,7 @@ export function HomePage({ posts }: HomePageProps) {
       {/* Selected Posts */}
       <section className="space-y-10">
         <h2 className="text-xl font-serif font-medium text-foreground tracking-tight flex items-center gap-2">
-          最新文章
+          {m.home_latest_posts()}
         </h2>
 
         <div className="space-y-8">
