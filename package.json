@@ -1,6 +1,6 @@
 {
   "name": "flare-stack-blog",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "author": {
     "email": "kuangdadu@gmail.com",
@@ -26,7 +26,9 @@
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "wrangler d1 migrations apply DB --remote",
+    "db:migrate": "bun scripts/safe-d1-migrate/main.ts",
+    "db:migrate:local": "bun scripts/safe-d1-migrate/main.ts --local",
+    "db:migrate:unsafe": "wrangler d1 migrations apply DB --remote",
     "auth:generate-schema": "bunx @better-auth/cli generate --config auth-cli.ts --output src/lib/db/schema/auth.table.ts",
     "create-theme": "bun scripts/create-theme.ts",
     "release": "export GITHUB_TOKEN=$(gh auth token) && release-it"

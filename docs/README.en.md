@@ -271,11 +271,24 @@ bun dev
 
 ### Database Commands
 
-| Command           | Definition                                           |
-| :---------------- | :--------------------------------------------------- |
-| `bun db:studio`   | Invokes the Drizzle Studio visual database interface |
-| `bun db:generate` | Generates schema migration files                     |
-| `bun db:migrate`  | Applies migrations to a connected remote D1 instance |
+| Command                | Definition                                                  |
+| :--------------------- | :---------------------------------------------------------- |
+| `bun db:studio`        | Invokes the Drizzle Studio visual database interface        |
+| `bun db:generate`      | Generates schema migration files                            |
+| `bun db:migrate`       | Safely applies remote D1 migrations and auto-rolls back on failure |
+| `bun db:migrate:local` | Safely applies local D1 migrations and auto-restores local state |
+| `bun db:migrate:unsafe` | Applies remote D1 migrations directly without verification |
+
+`bun db:migrate` and `bun db:migrate:local` reuse the schema-defined status constants and verify these counts before and after migration:
+
+- `posts`: total post count and the count for each post status
+- `comments`: total comments, root comments, reply comments, and the count for each comment status
+
+The safety script also adds these safeguards:
+
+- Remote mode: records a D1 Time Travel bookmark by default and automatically restores on verification failure
+- Remote mode: if you also want a SQL snapshot for manual incident analysis, run `bun scripts/safe-d1-migrate/main.ts --remote --with-export`
+- Local mode: snapshots `.wrangler/state` (or your custom `--persist-to` path) and restores it automatically on verification failure
 
 ### Simulating Cloudflare Resources Locally
 
@@ -289,10 +302,10 @@ The default workspace connects to remote D1/R2/KV resources. If an entirely loca
 }
 ```
 
-> **Note**: Locally simulated data is not synced remotely to Cloudflare, rendering it safe for exploratory setups. Apply local database migrations directly utilizing:
+> **Note**: Locally simulated data is not synced remotely to Cloudflare, rendering it safe for exploratory setups. For local database migrations, prefer:
 >
 > ```bash
-> wrangler d1 migrations apply DB
+> bun db:migrate:local
 > ```
 
 ## Contributing
