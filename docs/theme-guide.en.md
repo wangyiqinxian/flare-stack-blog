@@ -42,6 +42,7 @@ The `ThemeComponents` interface lists all the components a theme must export. Yo
 | `VerifyEmailPage`                             | Email verification page                                       |
 | `ProfilePage`                                 | User profile page                                             |
 | `config`                                      | Static theme config (data fetching params and preload config) |
+| `getDocumentStyle`                            | Optional: inject theme style variables onto the document root |
 | `Toaster`                                     | Toast notification component (Sonner wrapper)                 |
 
 > **Skeletons**: Used as `pendingComponent` in TanStack Router, showing a transitional UI during page data requests. Themes can decide whether to implement it based on their interaction design language (for instance, to coordinate with certain enter animations, you might choose to just return `null` instead of rendering placeholders).
@@ -229,6 +230,7 @@ The theme entry file must default-export an object satisfying `ThemeComponents`,
 
 ```ts
 // src/features/theme/themes/my-theme/index.ts
+import type { SiteConfig } from "@/features/config/site-config.schema";
 import type { ThemeComponents } from "@/features/theme/contract/components";
 import { config } from "./config";
 import { PublicLayout } from "./layouts/public-layout";
@@ -240,6 +242,7 @@ import Toaster from "@/components/ui/toaster";
 
 export default {
   config,
+  getDocumentStyle: (_siteConfig: SiteConfig) => undefined,
   PublicLayout,
   AuthLayout,
   UserLayout,
@@ -249,6 +252,8 @@ export default {
   // ... remaining components
 } satisfies ThemeComponents;
 ```
+
+If your theme needs to map runtime configuration into CSS variables, such as injecting a primary hue from `siteConfig` onto `<html>`, implement `getDocumentStyle`; otherwise just return `undefined`.
 
 If any required components are missing, TypeScript will throw an error here explicitly pinpointing the missing field.
 
@@ -326,7 +331,7 @@ Themes are independent of one another, but they **can and should** reuse shared 
 
 | Can import             | Source                                         | Description                               |
 | :--------------------- | :--------------------------------------------- | :---------------------------------------- |
-| Blog Config            | `@/blog.config`                                | Titles, authors, social links, etc.       |
+| Blog Default Config    | `@/blog.config`                                | Seeded defaults and fallback values; avoid reading runtime config from it inside theme components |
 | Business Queries/Hooks | `@/features/*/queries/`, `@/features/*/hooks/` | TanStack Query factories, business hooks  |
 | Schema Types           | `@/features/*/schema`                          | Zod schemas and TypeScript types          |
 | Tiptap Editor Config   | `@/features/posts/editor/config`               | Extension list for the post editor        |
@@ -338,7 +343,7 @@ Themes are independent of one another, but they **can and should** reuse shared 
 
 ## Theme-Specific Configuration
 
-Besides the `ThemeConfig` in the theme contract (data fetch parameters defined in `contract/config.ts`), themes can also declare **exclusive configuration items** in `blogConfig`, used for things requiring user customization like image paths and colors.
+Besides the `ThemeConfig` in the theme contract (data fetch parameters defined in `contract/config.ts`), themes can also declare **exclusive configuration items** in `blogConfig`, used for things requiring user customization like image paths and colors. Admin-managed **Settings** store the runtime site configuration, while `blog.config.ts` provides seeded defaults and fallback values.
 
 ### Conventions
 
@@ -350,35 +355,41 @@ export const blogConfig = {
   // ... common configs ...
   theme: {
     fuwari: {
-      homeBg: env.VITE_FUWARI_HOME_BG || "/images/home-bg.webp",
-      avatar: env.VITE_FUWARI_AVATAR || "/images/avatar.png",
+      homeBg: "/images/home-bg.webp",
+      avatar: "/images/avatar.png",
     },
     // "my-theme": { ... }
   },
 };
 ```
 
-### Environment Variable Naming Rules
+### Override Strategy
 
-Use the format `VITE_<THEME_NAME>_<KEY>`, for example:
+`blog.config.ts` is the fallback source. If admin-managed site settings are enabled, runtime site config is merged on the server over these defaults. In practice:
 
-| Env Variable          | Description                 | Default Value          |
-| :-------------------- | :-------------------------- | :--------------------- |
-| `VITE_FUWARI_HOME_BG` | Fuwari home background path | `/images/home-bg.webp` |
-| `VITE_FUWARI_AVATAR`  | Fuwari sidebar avatar path  | `/images/avatar.png`   |
-
-Newly added environment variables must be synchronously added to the Zod schema in `src/lib/env/client.env.ts`.
+- editors should update personalization from the admin **Settings** page
+- theme components should read runtime values from `siteConfig`
+- `blog.config.ts` is best used for initial defaults when introducing new theme fields
 
 ### Usage in Components
 
 ```tsx
-import { blogConfig } from "@/blog.config";
+import { useRouteContext } from "@tanstack/react-router";
 
-// Directly access the current theme's config
-<img src={blogConfig.theme.fuwari.homeBg} alt="" />;
+export function ProfileBackground() {
+  const { siteConfig } = useRouteContext({ from: "__root__" });
+
+  return <img src={siteConfig.theme.fuwari.homeBg} alt="" />;
+}
 ```
 
-> **Why not put it in `ThemeConfig`?** `ThemeConfig` is part of the compile-time contract, mainly used as data fetching parameters for route loaders (like page sizes). Things like image paths are deployment-level configs that are better injected via environment variables; putting them in `blogConfig` centralizes management and allows user overrides in the `.env` file.
+If you are adding a new theme field that can be overridden from admin settings:
+
+1. provide a default value in `src/blog.config.ts`
+2. declare the field in the site-config schema
+3. read it from runtime `siteConfig` inside the theme component
+
+> **Why not put it in `ThemeConfig`?** `ThemeConfig` is part of the compile-time contract and is mainly used for route-loader data parameters such as pagination sizes. Fields like image paths, brand labels, and other site-personalization values do not belong to route fetching parameters; placing them in `blogConfig` plus the site-config schema gives you sensible defaults while still allowing runtime overrides from the admin **Settings** page.
 
 ## Need to Know
 

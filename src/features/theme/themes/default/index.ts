@@ -1,5 +1,6 @@
 import "./styles/index.css";
 import Toaster from "@/components/ui/toaster";
+import type { SiteConfig } from "@/features/config/site-config.schema";
 import type { ThemeComponents } from "@/features/theme/contract/components";
 import { config } from "./config";
 import { AuthLayout } from "./layouts/auth-layout";
@@ -24,6 +25,7 @@ import { ProfilePage } from "./pages/user/profile";
  */
 export default {
   config,
+  getDocumentStyle: (_siteConfig: SiteConfig) => undefined,
   HomePage,
   HomePageSkeleton,
   PostsPage,

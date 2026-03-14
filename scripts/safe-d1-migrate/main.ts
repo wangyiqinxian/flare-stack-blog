@@ -30,6 +30,22 @@ type SafetySummary = {
   posts: PostSummary;
 };
 
+type TablePresence = {
+  hasComments: boolean;
+  hasD1Migrations: boolean;
+  hasPosts: boolean;
+};
+
+type VerificationPlan =
+  | {
+      kind: "fresh";
+      tables: TablePresence;
+    }
+  | {
+      kind: "verify";
+      tables: TablePresence;
+    };
+
 type LocalRestorePoint = {
   kind: "local";
   snapshotPath: string;
@@ -218,6 +234,21 @@ function executeSingleRow<Row extends Record<string, number | string | null>>(
   target: Target,
   persistTo?: string,
 ) {
+  const rows = executeRows<Row>(database, sql, target, persistTo);
+  const row = rows[0];
+  if (!row) {
+    throw new Error(`Query returned no rows: ${sql}`);
+  }
+
+  return row;
+}
+
+function executeRows<Row extends Record<string, number | string | null>>(
+  database: string,
+  sql: string,
+  target: Target,
+  persistTo?: string,
+) {
   const queryPath = writeQueryFile(sql);
 
   try {
@@ -230,12 +261,7 @@ function executeSingleRow<Row extends Record<string, number | string | null>>(
       queryPath,
     ]);
 
-    const row = output[0]?.results[0];
-    if (!row) {
-      throw new Error(`Query returned no rows: ${sql}`);
-    }
-
-    return row;
+    return output[0]?.results ?? [];
   } finally {
     fs.rmSync(queryPath, { force: true });
   }
@@ -306,6 +332,57 @@ function collectSafetySummary(
   );
 
   return { posts, comments };
+}
+
+function inspectTablePresence(
+  database: string,
+  target: Target,
+  persistTo?: string,
+): TablePresence {
+  const row = executeSingleRow<{
+    hasComments: number;
+    hasD1Migrations: number;
+    hasPosts: number;
+  }>(
+    database,
+    `
+      select
+        max(case when name = 'posts' then 1 else 0 end) as hasPosts,
+        max(case when name = 'comments' then 1 else 0 end) as hasComments,
+        max(case when name = 'd1_migrations' then 1 else 0 end) as hasD1Migrations
+      from sqlite_master
+      where type = 'table'
+        and name in ('posts', 'comments', 'd1_migrations')
+    `,
+    target,
+    persistTo,
+  );
+
+  return {
+    hasComments: Number(row.hasComments) === 1,
+    hasD1Migrations: Number(row.hasD1Migrations) === 1,
+    hasPosts: Number(row.hasPosts) === 1,
+  };
+}
+
+function resolveVerificationPlan(tables: TablePresence): VerificationPlan {
+  if (!tables.hasPosts && !tables.hasComments && !tables.hasD1Migrations) {
+    return {
+      kind: "fresh",
+      tables,
+    };
+  }
+
+  if (tables.hasPosts && tables.hasComments) {
+    return {
+      kind: "verify",
+      tables,
+    };
+  }
+
+  throw new Error(
+    `Unexpected database schema state before migration. Found tables: posts=${tables.hasPosts}, comments=${tables.hasComments}, d1_migrations=${tables.hasD1Migrations}`,
+  );
 }
 
 function writeSummary(label: string, stamp: string, summary: SafetySummary) {
@@ -531,10 +608,21 @@ async function main() {
     );
   }
 
-  const before = collectSafetySummary(database, target, effectivePersistTo);
-  const beforeSummaryPath = writeSummary("before", stamp, before);
-  console.log(`Saved pre-migration summary: ${beforeSummaryPath}`);
-  console.log(JSON.stringify(before, null, 2));
+  const verificationPlan = resolveVerificationPlan(
+    inspectTablePresence(database, target, effectivePersistTo),
+  );
+
+  let before: SafetySummary | null = null;
+  if (verificationPlan.kind === "verify") {
+    before = collectSafetySummary(database, target, effectivePersistTo);
+    const beforeSummaryPath = writeSummary("before", stamp, before);
+    console.log(`Saved pre-migration summary: ${beforeSummaryPath}`);
+    console.log(JSON.stringify(before, null, 2));
+  } else {
+    console.log(
+      "Fresh database detected. Skipping pre-migration count verification because posts/comments tables do not exist yet.",
+    );
+  }
 
   let migrationApplied = false;
 
@@ -547,16 +635,23 @@ async function main() {
     console.log(`Saved post-migration summary: ${afterSummaryPath}`);
     console.log(JSON.stringify(after, null, 2));
 
-    const diffs = diffSummary(before, after);
-    if (diffs.length > 0) {
-      throw new Error(
-        `Safety verification failed.\n${diffs.map((diff) => `- ${diff}`).join("\n")}`,
+    if (before) {
+      const diffs = diffSummary(before, after);
+      if (diffs.length > 0) {
+        throw new Error(
+          `Safety verification failed.\n${diffs.map((diff) => `- ${diff}`).join("\n")}`,
+        );
+      }
+
+      console.log(
+        "Safety verification passed. Post and comment counts are unchanged.",
       );
     }
-
-    console.log(
-      "Safety verification passed. Post and comment counts are unchanged.",
-    );
+    if (!before) {
+      console.log(
+        "Initial migration completed on a fresh database. Post-migration summary captured.",
+      );
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(message);

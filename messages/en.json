@@ -42,10 +42,7 @@
   ],
   "format_month_day": [
     {
-      "declarations": [
-        "input date",
-        "local formattedDateEn = date: datetime month=2-digit day=2-digit"
-      ],
+      "declarations": ["input date", "local formattedDateEn = date: datetime month=2-digit day=2-digit"],
       "match": {
         "date=*": "{formattedDateEn}"
       }
@@ -99,10 +96,7 @@
   ],
   "format_date": [
     {
-      "declarations": [
-        "input date",
-        "local formattedDateEn = date: datetime year=numeric month=2-digit day=2-digit"
-      ],
+      "declarations": ["input date", "local formattedDateEn = date: datetime year=numeric month=2-digit day=2-digit"],
       "match": {
         "date=*": "{formattedDateEn}"
       }
@@ -110,10 +104,7 @@
   ],
   "format_datetime": [
     {
-      "declarations": [
-        "input date",
-        "local formattedDateTimeEn = date: datetime year=numeric month=2-digit day=2-digit hour=2-digit minute=2-digit"
-      ],
+      "declarations": ["input date", "local formattedDateTimeEn = date: datetime year=numeric month=2-digit day=2-digit hour=2-digit minute=2-digit"],
       "match": {
         "date=*": "{formattedDateTimeEn}"
       }
@@ -214,7 +205,6 @@
   "profile_basic_info": "Basic Info",
   "profile_basic_settings": "Basic Settings",
   "profile_name": "Nickname",
-  "profile_name_placeholder": "Your nickname",
   "profile_avatar_url": "Avatar URL",
   "profile_avatar_url_placeholder": "https://...",
   "profile_save_changes": "Save Changes",
@@ -268,7 +258,6 @@
   "auth_layout_login_required_desc2": "Please log in to continue.",
   "auth_layout_go_to_login": "Go to Login",
   "auth_layout_back_home": "Back to Home",
-  "auth_error_default_title": "Request Failed",
   "auth_error_default_desc": "Please try again later.",
   "auth_error_user_already_exists": "This email has already been registered.",
   "auth_error_invalid_password": "The current password is incorrect.",
@@ -308,8 +297,6 @@
   "login_validation_password_required": "Please enter a password",
   "login_error_email_not_verified": "Email not verified",
   "login_error_invalid_credentials": "Invalid account or password",
-  "login_error_turnstile_failed": "Verification failed, please wait and try again",
-  "turnstile_error_failed_short": "Turnstile Verification Failed",
   "turnstile_error_failed_desc": "Please wait for verification to complete and try again.",
   "request_error_unauthenticated_title": "Authentication Required",
   "request_error_unauthenticated_desc": "Please sign in to continue.",
@@ -412,7 +399,6 @@
   "verify_email_success_desc": "Your email has been successfully verified. You can now enjoy full access.",
   "verify_email_success_action": "GO TO HOME",
   "verify_email_error_title": "VERIFICATION FAILED",
-  "verify_email_error_desc": "Invalid verification link or the link has expired. Please try resending the verification email.",
   "verify_email_error_invalid_token_desc": "The verification link has expired or is invalid.",
   "verify_email_error_generic_desc": "An error occurred during verification. Please try again.",
   "verify_email_error_action": "BACK TO LOGIN",
@@ -476,8 +462,6 @@
   "common_collapse": "Collapse",
   "common_select_date": "Select date",
   "common_switch_language": "Switch language",
-  "common_language_chinese": "Chinese",
-  "common_language_english": "English",
   "common_image_preview": "Image Preview",
   "common_view_full_image": "View full image",
   "common_untitled": "Untitled",
@@ -490,10 +474,7 @@
   "theme_toggle_title": "Theme: {theme}",
   "format_time": [
     {
-      "declarations": [
-        "input date",
-        "local formattedTimeEn = date: datetime hour=2-digit minute=2-digit hour12=true"
-      ],
+      "declarations": ["input date", "local formattedTimeEn = date: datetime hour=2-digit minute=2-digit hour12=true"],
       "match": {
         "date=*": "{formattedTimeEn}"
       }
@@ -501,10 +482,7 @@
   ],
   "format_month_day_time": [
     {
-      "declarations": [
-        "input date",
-        "local formattedDateTimeEn = date: datetime month=2-digit day=2-digit hour=2-digit minute=2-digit hour12=true"
-      ],
+      "declarations": ["input date", "local formattedDateTimeEn = date: datetime month=2-digit day=2-digit hour=2-digit minute=2-digit hour12=true"],
       "match": {
         "date=*": "{formattedDateTimeEn}"
       }
@@ -747,7 +725,6 @@
   "tag_selector_search_placeholder": "Search or create tag...",
   "tag_selector_create_action": "Create \"{searchTerm}\"",
   "tag_selector_load_fail": "Failed to load tags",
-  "tag_selector_unknown_error": "Unknown error",
   "tag_selector_no_match": "No matching tags found",
   "tag_selector_empty": "No tags available (type to create)",
   "tag_manager_title": "Tags",
@@ -1073,9 +1050,88 @@
   "settings_header_desc": "Configure email notifications, webhooks, and system maintenance.",
   "settings_btn_saving": "Saving...",
   "settings_btn_save": "Apply Changes",
+  "settings_tab_site": "Personalization",
   "settings_tab_email": "Email",
   "settings_tab_webhook": "Webhooks",
   "settings_tab_maintenance": "Maintenance",
+  "settings_site_title": "Personalization",
+  "settings_site_desc": "Configure site and theme customization.",
+  "settings_site_section_theme_title": "Theme",
+  "settings_site_section_theme_desc": "Current build theme: {theme}. Only options used by this theme are shown here.",
+  "settings_site_section_basic_title": "Basic Information",
+  "settings_site_section_basic_desc": "Configure the site title, author, description, and related basic info.",
+  "settings_site_section_social_title": "Social Links",
+  "settings_site_section_social_desc": "Public contact links displayed on the site.",
+  "settings_site_section_icons_title": "Site Icons",
+  "settings_site_section_icons_desc": "Upload your favicons and app icons for different platforms. Generate an icon pack with realfavicongenerator.net first, then fill in the site asset paths.",
+  "settings_site_field_title": "Site Title",
+  "settings_site_field_title_hint": "Used for page titles, manifest name, and related metadata.",
+  "settings_site_field_title_ph": "My Blog",
+  "settings_site_field_author": "Author",
+  "settings_site_field_author_ph": "Author",
+  "settings_site_field_description": "Description",
+  "settings_site_field_description_hint": "Used for page descriptions and related SEO metadata.",
+  "settings_site_field_description_ph": "A short description of your site.",
+  "settings_site_field_github": "GitHub",
+  "settings_site_field_github_ph": "https://github.com/your-name",
+  "settings_site_field_public_email": "Public Email",
+  "settings_site_field_public_email_ph": "hello@example.com",
+  "settings_site_field_favicon_svg": "Favicon SVG",
+  "settings_site_field_favicon_ico": "Favicon ICO",
+  "settings_site_field_favicon_96": "Favicon 96x96",
+  "settings_site_field_apple_touch_icon": "Apple Touch Icon",
+  "settings_site_field_web_app_192": "Web App 192x192",
+  "settings_site_field_web_app_512": "Web App 512x512",
+  "settings_site_field_navbar_name": "Navbar Name",
+  "settings_site_field_navbar_name_hint": "Brand label shown in the default theme navigation.",
+  "settings_site_field_navbar_name_ph": "Brand",
+  "settings_site_field_home_image": "Home Background",
+  "settings_site_field_home_image_hint": "Enter a site asset path, such as a media-library path or site asset path.",
+  "settings_site_field_global_image": "Global Background",
+  "settings_site_field_global_image_hint": "Used on non-home pages and transition states.",
+  "settings_site_field_light_opacity": "Light Opacity",
+  "settings_site_field_light_opacity_hint": "Controls how visible the background image is in light mode. Higher values make it more noticeable.",
+  "settings_site_field_dark_opacity": "Dark Opacity",
+  "settings_site_field_dark_opacity_hint": "Controls how visible the background image is in dark mode. Higher values make it more noticeable.",
+  "settings_site_field_backdrop_blur": "Backdrop Blur px",
+  "settings_site_field_backdrop_blur_hint": "Controls how much the background image is blurred to balance atmosphere and text readability. Higher values reduce detail.",
+  "settings_site_field_transition_duration": "Transition Duration ms",
+  "settings_site_field_transition_duration_hint": "Only affects the default theme background layer fade, mainly for homepage background switching. It does not control router-level page transitions.",
+  "settings_site_field_avatar": "Avatar",
+  "settings_site_field_primary_hue": "Primary Hue",
+  "settings_site_field_primary_hue_hint": "Controls the fuwari theme accent hue. Changing it updates links, buttons, highlights, and tinted surfaces.",
+  "settings_site_primary_preview_title": "Theme Preview",
+  "settings_site_primary_preview_desc": "Live fuwari accent preview, current hue: {hue}deg.",
+  "settings_site_primary_preview_card_label": "Tinted Card",
+  "settings_site_primary_preview_card_title": "Primary Atmosphere",
+  "settings_site_primary_preview_card_desc": "This preview uses the same hue-driven palette as fuwari buttons, highlights, and soft backgrounds.",
+  "settings_site_primary_preview_btn_primary": "Primary Button",
+  "settings_site_primary_preview_btn_tinted": "Tinted Surface",
+  "settings_site_validation_too_long": [
+    {
+      "declarations": ["input max"],
+      "match": {
+        "max=*": "Maximum {max} characters"
+      }
+    }
+  ],
+  "settings_site_validation_invalid_url": "Please enter a valid URL",
+  "settings_site_validation_invalid_email": "Please enter a valid email address",
+  "settings_site_validation_hue_range": "Value must be between 0 and 360",
+  "settings_site_validation_invalid_asset_ref": "Please enter a root-relative site asset path",
+  "settings_site_validation_invalid_asset_path": "Please enter a root-relative site asset path",
+  "settings_site_validation_opacity_range": "Value must be between 0 and 0.4",
+  "settings_site_validation_blur_range": "Value must be between 0 and 32",
+  "settings_site_validation_transition_range": "Value must be between 0 and 1500",
+  "settings_asset_validation_file_required": "Please select a file to upload",
+  "settings_asset_validation_path_required": "Asset path is required",
+  "settings_asset_validation_path_invalid": "Asset path must start with favicon/ or themes/default/ or themes/fuwari/",
+  "settings_asset_validation_file_too_large": "File size must be less than 2MB",
+  "settings_asset_validation_file_invalid_type": "Only image files (JPEG, PNG, WebP, GIF, SVG, ICO) are supported",
+  "settings_asset_upload_success": "Asset uploaded",
+  "settings_asset_upload_fail": "Upload failed",
+  "settings_asset_upload_btn": "Upload",
+  "settings_asset_uploading": "Uploading...",
   "settings_email_title": "Email Configuration",
   "settings_email_desc": "Configure sender accounts for verification, password resets, and notifications.",
   "settings_webhook_title": "Webhook Notifications",

@@ -17,6 +17,7 @@ import { PostsPage, PostsPageSkeleton } from "./pages/posts";
 import { SearchPage } from "./pages/search";
 import { SubmitFriendLinkPage } from "./pages/submit-friend-link";
 import { ProfilePage } from "./pages/user/profile";
+import { getFuwariThemeStyle } from "./theme-style";
 
 /**
  * Theme: fuwari — implements the full ThemeComponents contract.
@@ -24,6 +25,7 @@ import { ProfilePage } from "./pages/user/profile";
  */
 export default {
   config,
+  getDocumentStyle: getFuwariThemeStyle,
   HomePage,
   HomePageSkeleton,
   PostsPage,

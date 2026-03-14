@@ -125,7 +125,7 @@ All user-facing pages and layouts in Flare Stack Blog are decoupled from busines
 
 #### Available Themes
 
-For the configuration parameters of each theme, please refer to `src/blog.config.ts`.
+Site personalization such as title, description, social links, favicon, and default-theme background assets is now managed from the admin **Settings** page. `src/blog.config.ts` mainly serves as seeded defaults and runtime fallback values; see the [Theme Development Guide](./theme-guide.en.md) for how themes should consume runtime `siteConfig`.
 
 <table>
   <tr>
@@ -209,14 +209,6 @@ Please refer to the **[Flare Stack Blog Deployment Guide](./deployment-guide.en.
 | `UMAMI_USERNAME`          | Runtime    | Umami username (Self-hosted exclusively).                                                                |
 | `UMAMI_PASSWORD`          | Runtime    | Umami password (Self-hosted exclusively).                                                                |
 | `VITE_UMAMI_WEBSITE_ID`   | Build-time | Umami Website ID.                                                                                        |
-| `VITE_BLOG_TITLE`         | Build-time | Blog title.                                                                                              |
-| `VITE_BLOG_NAME`          | Build-time | Blog short name.                                                                                         |
-| `VITE_BLOG_AUTHOR`        | Build-time | Author name.                                                                                             |
-| `VITE_BLOG_DESCRIPTION`   | Build-time | Blog description.                                                                                        |
-| `VITE_BLOG_GITHUB`        | Build-time | GitHub homepage link.                                                                                    |
-| `VITE_BLOG_EMAIL`         | Build-time | Contact email.                                                                                           |
-| `VITE_FUWARI_HOME_BG`     | Build-time | Default home background path for the Fuwari theme (`/images/home-bg.webp`).                              |
-| `VITE_FUWARI_AVATAR`      | Build-time | Default avatar image path for the Fuwari theme (`/images/avatar.png`).                                   |
 
 ---
 
