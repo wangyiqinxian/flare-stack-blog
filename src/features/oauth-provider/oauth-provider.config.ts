@@ -1,10 +1,12 @@
 import { oauthProvider } from "@better-auth/oauth-provider";
 import { jwt } from "better-auth/plugins";
+import { seconds } from "@/lib/duration";
 import { flattenBlogScopes } from "./service/oauth-provider.scope";
 
 export const OAUTH_PROVIDER_LOGIN_PAGE = "/login";
 export const OAUTH_PROVIDER_CONSENT_PAGE = "/oauth/consent";
 export const OAUTH_JWKS_PATH = "/.well-known/jwks.json";
+export const OAUTH_ACCESS_TOKEN_EXPIRES_IN = seconds("365d");
 
 const OAUTH_STANDARD_SCOPE_VALUES = [
   "openid",
@@ -78,6 +80,7 @@ export function createOAuthJwtPlugin(baseURL: string) {
 
 export function createOAuthProviderPlugin(baseURL: string) {
   return oauthProvider({
+    accessTokenExpiresIn: OAUTH_ACCESS_TOKEN_EXPIRES_IN,
     loginPage: OAUTH_PROVIDER_LOGIN_PAGE,
     consentPage: OAUTH_PROVIDER_CONSENT_PAGE,
     scopes: OAUTH_PROVIDER_SCOPES,

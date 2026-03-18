@@ -28,6 +28,21 @@ export interface OAuthAccessTokenRecordLike {
   } | null;
 }
 
+export interface OAuthJwtAccessTokenRecordLike {
+  clientId: string | null;
+  oauthClient: {
+    disabled: boolean | null;
+  } | null;
+  oauthConsent: {
+    id: string;
+  } | null;
+  session: {
+    expiresAt: Date;
+  } | null;
+  sessionId: string | null;
+  userId: string | null;
+}
+
 export function createOAuthVerificationError(
   requestUrl: string,
   status: "UNAUTHORIZED" | "FORBIDDEN",
@@ -120,6 +135,47 @@ export function assertOpaqueAccessTokenIsActive(
   return {
     expiresAt: tokenRecord.expiresAt,
   };
+}
+
+export function assertJwtAccessTokenIsActive(
+  requestUrl: string,
+  tokenRecord: OAuthJwtAccessTokenRecordLike,
+  now: Date,
+) {
+  if (!tokenRecord.clientId) {
+    throw createOAuthVerificationError(
+      requestUrl,
+      "UNAUTHORIZED",
+      "token invalid",
+    );
+  }
+
+  if (!tokenRecord.oauthClient || tokenRecord.oauthClient.disabled) {
+    throw createOAuthVerificationError(
+      requestUrl,
+      "UNAUTHORIZED",
+      "token inactive",
+    );
+  }
+
+  if (tokenRecord.userId && !tokenRecord.oauthConsent) {
+    throw createOAuthVerificationError(
+      requestUrl,
+      "UNAUTHORIZED",
+      "token inactive",
+    );
+  }
+
+  if (
+    tokenRecord.sessionId &&
+    (!tokenRecord.session || tokenRecord.session.expiresAt < now)
+  ) {
+    throw createOAuthVerificationError(
+      requestUrl,
+      "UNAUTHORIZED",
+      "token inactive",
+    );
+  }
 }
 
 export function assertOpaqueAccessTokenScopes(

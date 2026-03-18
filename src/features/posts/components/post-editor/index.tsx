@@ -2,11 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useBlocker } from "@tanstack/react-router";
 import type { JSONContent, Editor as TiptapEditor } from "@tiptap/react";
 import { History, Loader2 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Editor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import ConfirmationModal from "@/components/ui/confirmation-modal";
 import { extensions } from "@/features/posts/editor/config";
+import type { PostRevisionSnapshot } from "@/features/posts/schema/post-revisions.schema";
 import { tagsAdminQueryOptions } from "@/features/tags/queries";
 import { m } from "@/paraglide/messages";
 import { EditorTableOfContents } from "./editor-table-of-contents";
@@ -143,6 +144,29 @@ export function PostEditor({ initialData, onSave }: PostEditorProps) {
     [initialData.id, markSaved, post.hasPublicCache],
   );
 
+  const currentSnapshot = useMemo<PostRevisionSnapshot>(
+    () => ({
+      title: post.title,
+      summary: post.summary.trim() || null,
+      slug: post.slug,
+      status: post.status,
+      publishedAt: post.publishedAt ? post.publishedAt.toISOString() : null,
+      readTimeInMinutes: post.readTimeInMinutes,
+      contentJson: post.contentJson,
+      tagIds: [...new Set(post.tagIds)].sort((a, b) => a - b),
+    }),
+    [
+      post.contentJson,
+      post.publishedAt,
+      post.readTimeInMinutes,
+      post.slug,
+      post.status,
+      post.summary,
+      post.tagIds,
+      post.title,
+    ],
+  );
+
   return (
     <div className="fixed inset-0 z-80 flex flex-col bg-background overflow-hidden">
       <ConfirmationModal
@@ -169,6 +193,7 @@ export function PostEditor({ initialData, onSave }: PostEditorProps) {
         postId={initialData.id}
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
+        currentSnapshot={currentSnapshot}
         allTags={allTags}
         onRestoreApplied={handleRestoreApplied}
       />

@@ -1,14 +1,19 @@
-import { oauthProviderResourceClient } from "@better-auth/oauth-provider/resource-client";
-import { APIError } from "better-call";
-import type { JWTPayload } from "jose";
+import type { JSONWebKeySet, JWTPayload } from "jose";
+import { getAuth } from "@/lib/auth/auth.server";
 import { serverEnv } from "@/lib/env/server.env";
-import { findOAuthAccessTokenByToken } from "../data/oauth-provider.data";
+import {
+  findOAuthAccessTokenByToken,
+  findOAuthClientByClientId,
+  findOAuthConsentByClientIdAndUserId,
+  findSessionById,
+} from "../data/oauth-provider.data";
 import {
   getOAuthProtectedResourceUrl,
   type OAuthScope,
 } from "../oauth-provider.config";
 import type { OAuthScopeRequest } from "../schema/oauth-provider.schema";
 import {
+  assertJwtAccessTokenIsActive,
   assertOpaqueAccessTokenIsActive,
   assertOpaqueAccessTokenScopes,
   buildOpaqueAccessTokenPayload,
@@ -19,10 +24,110 @@ import {
   parsePersistedScopes,
 } from "../utils/oauth-provider-access-token";
 import {
+  readJwtVerificationMetadata,
+  verifyLocalOAuthJwtAccessToken,
+} from "./oauth-provider.jwt-verifier";
+import {
   getOAuthAuthorizationServer,
   getOAuthJwksUrl,
-  normalizeRequiredScopes,
 } from "./oauth-provider.service";
+
+async function fetchLocalOAuthJwks(db: DB, env: Env): Promise<JSONWebKeySet> {
+  const auth = getAuth({ db, env });
+  const baseUrl = serverEnv(env).BETTER_AUTH_URL;
+  const request = new Request(
+    new URL("/api/auth/.well-known/jwks.json", baseUrl),
+    {
+      headers: {
+        Accept: "application/json",
+      },
+      method: "GET",
+    },
+  );
+  const response = await auth.handler(request);
+
+  if (!response.ok) {
+    throw new Error(`local jwks request failed with status ${response.status}`);
+  }
+
+  return (await response.json()) as JSONWebKeySet;
+}
+
+async function verifyJwtOAuthAccessToken(
+  db: DB,
+  env: Env,
+  requestUrl: string,
+  accessToken: string,
+  requiredScopes: OAuthScope[] | OAuthScopeRequest = [],
+): Promise<JWTPayload> {
+  const startedAt = Date.now();
+  const issuer = getOAuthAuthorizationServer(env);
+  const audience = getOAuthProtectedResourceUrl(serverEnv(env).BETTER_AUTH_URL);
+  const jwksUrl = getOAuthJwksUrl(env);
+  const jwtMetadata = readJwtVerificationMetadata(accessToken);
+
+  try {
+    const jwt = await verifyLocalOAuthJwtAccessToken({
+      accessToken,
+      audience,
+      fetchJwks: () => fetchLocalOAuthJwks(db, env),
+      issuer,
+      requestUrl,
+      requiredScopes,
+    });
+    const clientId =
+      typeof jwt.client_id === "string"
+        ? jwt.client_id
+        : typeof jwt.azp === "string"
+          ? jwt.azp
+          : null;
+    const sessionId = typeof jwt.sid === "string" ? jwt.sid : null;
+    const userId = typeof jwt.sub === "string" ? jwt.sub : null;
+    const [oauthClient, oauthConsent, session] = await Promise.all([
+      clientId
+        ? findOAuthClientByClientId(db, clientId)
+        : Promise.resolve(null),
+      clientId && userId
+        ? findOAuthConsentByClientIdAndUserId(db, clientId, userId)
+        : Promise.resolve(null),
+      sessionId ? findSessionById(db, sessionId) : Promise.resolve(null),
+    ]);
+
+    assertJwtAccessTokenIsActive(
+      requestUrl,
+      {
+        clientId,
+        oauthClient: oauthClient ?? null,
+        oauthConsent: oauthConsent ?? null,
+        session: session ?? null,
+        sessionId,
+        userId,
+      },
+      new Date(),
+    );
+
+    return jwt;
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        message: "local oauth jwt verification failed",
+        error: error instanceof Error ? error.message : String(error),
+        request: {
+          requestUrl,
+        },
+        verification: {
+          audience,
+          issuer,
+          jwksUrl,
+          durationMs: Date.now() - startedAt,
+          ...jwtMetadata,
+        },
+      }),
+    );
+
+    throw error;
+  }
+}
 
 async function findStoredOpaqueAccessToken(db: DB, accessToken: string) {
   const storedToken = await hashOpaqueAccessToken(accessToken);
@@ -80,24 +185,16 @@ export async function verifyOAuthAccessToken(
     );
   }
 
-  const resourceClient = oauthProviderResourceClient().getActions();
-
   try {
-    return await resourceClient.verifyAccessToken(accessToken, {
-      jwksUrl: getOAuthJwksUrl(env),
-      scopes: normalizeRequiredScopes(requiredScopes),
-      verifyOptions: {
-        audience: getOAuthProtectedResourceUrl(serverEnv(env).BETTER_AUTH_URL),
-        issuer: getOAuthAuthorizationServer(env),
-      },
-    });
+    return await verifyJwtOAuthAccessToken(
+      db,
+      env,
+      requestUrl,
+      accessToken,
+      requiredScopes,
+    );
   } catch (error) {
-    if (
-      error instanceof APIError &&
-      typeof error.body?.message === "string" &&
-      error.body.message === "no token payload" &&
-      !isLikelyJwtAccessToken(accessToken)
-    ) {
+    if (!isLikelyJwtAccessToken(accessToken)) {
       return await verifyOpaqueOAuthAccessToken(
         db,
         env,
