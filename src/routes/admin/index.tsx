@@ -247,7 +247,7 @@ function DashboardOverview() {
                   <div key={i} className="group">
                     <div className="flex justify-between items-baseline mb-1">
                       <div className="text-xs text-foreground/80 font-medium truncate max-w-45 group-hover:text-foreground transition-colors">
-                        {page.slug}
+                        {page.title}
                       </div>
                       <div className="text-[10px] font-mono text-muted-foreground">
                         {page.views}

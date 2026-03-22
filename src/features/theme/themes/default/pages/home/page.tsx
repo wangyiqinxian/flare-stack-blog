@@ -1,6 +1,10 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
-import { Github, Mail, Rss, Terminal } from "lucide-react";
+import { Terminal } from "lucide-react";
 import { useMemo } from "react";
+import {
+  resolveSocialHref,
+  SOCIAL_PLATFORMS,
+} from "@/features/config/utils/social-platforms";
 import { useViewCounts } from "@/features/pageview/queries";
 import type { HomePageProps } from "@/features/theme/contract/pages";
 import { PostItem } from "@/features/theme/themes/default/components/post-item";
@@ -53,31 +57,34 @@ export function HomePage({ posts, pinnedPosts }: HomePageProps) {
         </header>
 
         <div className="flex items-center gap-6 text-muted-foreground">
-          <a
-            href={siteConfig.social.github}
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-foreground transition-colors"
-            aria-label="GitHub"
-          >
-            <Github size={20} strokeWidth={1.5} />
-          </a>
-          <a
-            href="/rss.xml"
-            target="_blank"
-            className="hover:text-foreground transition-colors"
-            rel="noreferrer"
-            aria-label={m.rss_subscription()}
-          >
-            <Rss size={20} strokeWidth={1.5} />
-          </a>
-          <a
-            href={`mailto:${siteConfig.social.email}`}
-            className="hover:text-foreground transition-colors"
-            aria-label={m.send_email()}
-          >
-            <Mail size={20} strokeWidth={1.5} />
-          </a>
+          {siteConfig.social
+            .filter((link) => link.url)
+            .map((link, i) => {
+              const preset =
+                link.platform !== "custom"
+                  ? SOCIAL_PLATFORMS[link.platform]
+                  : null;
+              const Icon = preset?.icon;
+              const label = preset?.label ?? link.label ?? "";
+              const href = resolveSocialHref(link.platform, link.url);
+
+              return (
+                <a
+                  key={`${link.platform}-${i}`}
+                  href={href}
+                  target={link.platform === "email" ? undefined : "_blank"}
+                  rel={link.platform === "email" ? undefined : "noreferrer"}
+                  className="hover:text-foreground transition-colors"
+                  aria-label={label}
+                >
+                  {Icon ? (
+                    <Icon size={20} strokeWidth={1.5} />
+                  ) : (
+                    <img src={link.icon} alt={label} className="w-5 h-5" />
+                  )}
+                </a>
+              );
+            })}
         </div>
       </section>
 

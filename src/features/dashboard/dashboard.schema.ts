@@ -40,7 +40,13 @@ export const DashboardResponseSchema = z.object({
           })
           .optional(),
         topPages: z
-          .array(z.object({ slug: z.string(), views: z.number() }))
+          .array(
+            z.object({
+              slug: z.string(),
+              title: z.string(),
+              views: z.number(),
+            }),
+          )
           .optional(),
         lastUpdated: z.number(),
       }),

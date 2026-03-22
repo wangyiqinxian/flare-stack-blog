@@ -78,10 +78,11 @@ export async function getTopPages(
   startAt: Date,
   endAt: Date,
   limit = 5,
-): Promise<Array<{ slug: string; views: number }>> {
+): Promise<Array<{ slug: string; title: string; views: number }>> {
   return db
     .select({
       slug: PostsTable.slug,
+      title: PostsTable.title,
       views: count().as("views"),
     })
     .from(PageViewsTable)

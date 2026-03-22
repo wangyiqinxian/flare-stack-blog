@@ -9,7 +9,7 @@ export const TrafficRangeDataSchema = z.object({
   traffic: z.array(z.object({ date: z.number(), views: z.number() })),
   overview: TrafficOverviewSchema.optional(),
   topPages: z
-    .array(z.object({ slug: z.string(), views: z.number() }))
+    .array(z.object({ slug: z.string(), title: z.string(), views: z.number() }))
     .optional(),
   lastUpdated: z.number(),
 });

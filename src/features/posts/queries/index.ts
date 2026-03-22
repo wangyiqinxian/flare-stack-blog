@@ -131,7 +131,19 @@ export function relatedPostsQuery(slug: string, limit?: number) {
         query: { limit: limit != null ? String(limit) : undefined },
       });
       if (!res.ok) throw new Error("Failed to fetch related posts");
-      return PostItemSchema.array().parse(await res.json());
+      const json = await res.json();
+      const result = PostItemSchema.array().safeParse(json);
+      if (!result.success) {
+        console.error(
+          JSON.stringify({
+            message: "related posts response parse failed",
+            error: result.error.message,
+            received: typeof json,
+          }),
+        );
+        return [];
+      }
+      return result.data;
     },
   });
 }
