@@ -1,7 +1,4 @@
-import { handleEmailMessage } from "@/features/email/api/email.consumer";
-import { handlePostAutoSnapshotMessage } from "@/features/posts/api/post-auto-snapshot.consumer";
-import { handleWebhookMessage } from "@/features/webhook/api/webhook.consumer";
-import { queueMessageSchema } from "@/lib/queue/queue.schema";
+import { handleQueueBatch } from "@/lib/queue/queue.handler";
 
 export { CommentModerationWorkflow } from "@/features/comments/workflows/comment-moderation";
 export { ExportWorkflow } from "@/features/import-export/workflows/export.workflow";
@@ -29,56 +26,6 @@ export default {
     return handleRootRequest(request, env, ctx);
   },
   async queue(batch, env, ctx) {
-    for (const message of batch.messages) {
-      const parsed = queueMessageSchema.safeParse(message.body);
-      if (!parsed.success) {
-        console.error(
-          JSON.stringify({
-            message: "queue invalid message",
-            body: message.body,
-            error: parsed.error.message,
-          }),
-        );
-        message.ack();
-        continue;
-      }
-
-      try {
-        const event = parsed.data;
-        switch (event.type) {
-          case "EMAIL":
-            await handleEmailMessage(
-              {
-                env,
-                executionCtx: ctx,
-              },
-              {
-                ...event.data,
-                idempotencyKey: message.id,
-              },
-            );
-            break;
-          case "WEBHOOK":
-            await handleWebhookMessage({ env }, event.data, message.id);
-            break;
-          case "POST_AUTO_SNAPSHOT":
-            await handlePostAutoSnapshotMessage({ env }, event.data);
-            break;
-          default:
-            event satisfies never;
-            throw new Error("Unknown queue message type");
-        }
-        message.ack();
-      } catch (error) {
-        console.error(
-          JSON.stringify({
-            message: "queue processing failed",
-            attempt: message.attempts,
-            error: error instanceof Error ? error.message : "unknown error",
-          }),
-        );
-        message.retry();
-      }
-    }
+    await handleQueueBatch(batch, env, ctx);
   },
 } satisfies ExportedHandler<Env>;

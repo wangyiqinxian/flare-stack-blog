@@ -28,6 +28,7 @@ export function PostEditor({ initialData, onSave }: PostEditorProps) {
     readTimeInMinutes: initialData.readTimeInMinutes,
     contentJson: initialData.contentJson ?? null,
     publishedAt: initialData.publishedAt,
+    pinnedAt: initialData.pinnedAt,
     tagIds: initialData.tagIds,
     isSynced: initialData.isSynced,
     hasPublicCache: initialData.hasPublicCache,
@@ -132,6 +133,7 @@ export function PostEditor({ initialData, onSave }: PostEditorProps) {
         publishedAt: snapshot.publishedAt
           ? new Date(snapshot.publishedAt)
           : null,
+        pinnedAt: post.pinnedAt,
         tagIds: snapshot.tagIds,
         isSynced: snapshot.status === "draft" ? !hasPublicCache : false,
         hasPublicCache,

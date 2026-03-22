@@ -13,6 +13,8 @@
   "not_found_return": "返回主页",
   "home_greeting": "你好",
   "home_latest_posts": "最新文章",
+  "home_pinned_posts": "置顶",
+  "home_popular_posts": "热门",
   "home_view_all_posts": "查看全部文章",
   "home_intro_prefix": "我是",
   "home_intro_separator": "，",
@@ -88,6 +90,14 @@
       "declarations": ["input count", "local formattedCountZh = count: number"],
       "match": {
         "count=*": "{formattedCountZh} 分钟"
+      }
+    }
+  ],
+  "post_views_count": [
+    {
+      "declarations": ["input count", "local formattedCountZh = count: number"],
+      "match": {
+        "count=*": "{formattedCountZh} 次浏览"
       }
     }
   ],
@@ -524,13 +534,8 @@
   "admin_overview_stat_drafts": "草稿箱",
   "admin_overview_trend_in_progress": "进行中",
   "admin_overview_traffic_title": "流量概览",
-  "admin_overview_open_analytics": "打开统计",
   "admin_overview_metric_visitors": "访客数",
   "admin_overview_metric_page_views": "浏览量",
-  "admin_overview_metric_visits": "总访问",
-  "admin_overview_metric_bounce_rate": "跳出率",
-  "admin_overview_analytics_unconfigured": "统计未配置",
-  "admin_overview_analytics_unconfigured_desc": "请配置 UMAMI_SRC 和 VITE_UMAMI_WEBSITE_ID 环境变量",
   "admin_overview_no_traffic": "暂无流量数据",
   "admin_overview_top_pages_title": "热门内容",
   "admin_overview_no_top_pages": "暂无数据",
@@ -625,6 +630,9 @@
   "editor_meta_tags": "标签",
   "editor_meta_auto_generate": "自动生成",
   "editor_meta_summary": "摘要",
+  "editor_meta_pin": "置顶文章",
+  "editor_meta_pinned": "已置顶",
+  "editor_meta_unpinned": "未置顶",
   "editor_content_placeholder": "开始记录...",
   "editor_summary_placeholder": "简短的介绍...",
   "editor_history_open": "历史记录",
@@ -1206,7 +1214,6 @@
   "settings_mcp_toast_disconnect_failed": "断开连接失败",
   "settings_mcp_connection_unnamed": "未命名客户端",
   "settings_mcp_connection_connected_label": "连接时间",
-  "settings_mcp_connection_activity_label": "最近活动",
   "settings_mcp_connection_disconnect_btn": "断开连接",
   "settings_mcp_connection_redirect_uris": "回调地址",
   "settings_mcp_connection_granted_scopes": "已授权权限范围（Scope）",

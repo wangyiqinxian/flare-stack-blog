@@ -13,6 +13,8 @@
   "not_found_return": "Return to Home",
   "home_greeting": "Hello",
   "home_latest_posts": "Latest Posts",
+  "home_pinned_posts": "Pinned",
+  "home_popular_posts": "Popular",
   "home_view_all_posts": "View all posts",
   "home_intro_prefix": "I am",
   "home_intro_separator": ", ",
@@ -91,6 +93,15 @@
       "match": {
         "count=1": "{formattedCountEn} minute",
         "count=*": "{formattedCountEn} minutes"
+      }
+    }
+  ],
+  "post_views_count": [
+    {
+      "declarations": ["input count", "local formattedCountEn = count: number"],
+      "match": {
+        "count=1": "{formattedCountEn} view",
+        "count=*": "{formattedCountEn} views"
       }
     }
   ],
@@ -530,13 +541,8 @@
   "admin_overview_stat_drafts": "Drafts",
   "admin_overview_trend_in_progress": "In progress",
   "admin_overview_traffic_title": "Traffic",
-  "admin_overview_open_analytics": "Open Analytics",
   "admin_overview_metric_visitors": "Visitors",
   "admin_overview_metric_page_views": "Views",
-  "admin_overview_metric_visits": "Visits",
-  "admin_overview_metric_bounce_rate": "Bounce Rate",
-  "admin_overview_analytics_unconfigured": "Analytics not configured",
-  "admin_overview_analytics_unconfigured_desc": "Set the UMAMI_SRC and VITE_UMAMI_WEBSITE_ID environment variables",
   "admin_overview_no_traffic": "No traffic data",
   "admin_overview_top_pages_title": "Top Content",
   "admin_overview_no_top_pages": "No data",
@@ -631,6 +637,9 @@
   "editor_meta_tags": "Tags",
   "editor_meta_auto_generate": "Auto-gen",
   "editor_meta_summary": "Summary",
+  "editor_meta_pin": "Pin Post",
+  "editor_meta_pinned": "Pinned",
+  "editor_meta_unpinned": "Not Pinned",
   "editor_content_placeholder": "Start writing...",
   "editor_summary_placeholder": "A brief introduction...",
   "editor_history_open": "History",
@@ -1213,7 +1222,6 @@
   "settings_mcp_toast_disconnect_failed": "Failed to disconnect client",
   "settings_mcp_connection_unnamed": "Unnamed client",
   "settings_mcp_connection_connected_label": "Connected",
-  "settings_mcp_connection_activity_label": "Last Activity",
   "settings_mcp_connection_disconnect_btn": "Disconnect",
   "settings_mcp_connection_redirect_uris": "Redirect URIs",
   "settings_mcp_connection_granted_scopes": "Granted Scopes",
