@@ -119,11 +119,9 @@ jobs:
 
       - name: Inject Resource IDs
         run: |
-          cp wrangler.example.jsonc wrangler.jsonc
-          sed -i "s/D1_DATABASE_ID/$D1_DATABASE_ID/g" wrangler.jsonc
-          sed -i "s/KV_NAMESPACE_ID/$KV_NAMESPACE_ID/g" wrangler.jsonc
-          sed -i "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" wrangler.jsonc
-          sed -i "s/bucket-name-placeholder/$BUCKET_NAME/g" wrangler.jsonc
+          ROUTE="${{ vars.ROUTE }}"
+          export ROUTE
+          bun run wrangler:prepare
 
       - name: Generate Secrets JSON
         run: |
