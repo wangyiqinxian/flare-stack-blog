@@ -9,10 +9,10 @@ import { z } from "zod";
 import { siteConfigQuery, siteDomainQuery } from "@/features/config/queries";
 import { postsInfiniteQueryOptions } from "@/features/posts/queries";
 import { PostTagNameSchema } from "@/features/posts/schema/posts.schema";
+import { getNextPostTagFilter } from "@/features/posts/utils/post-tag-filter";
 import { tagsQueryOptions } from "@/features/tags/queries";
 import { buildCanonicalUrl, canonicalLink } from "@/lib/seo";
 import { m } from "@/paraglide/messages";
-import { getPostTagSearch } from "./posts.search";
 
 const { postsPerPage } = theme.config.posts;
 
@@ -75,7 +75,7 @@ function RouteComponent() {
 
   const handleTagClick = (clickedTag?: string) => {
     navigate({
-      search: getPostTagSearch(tagName, clickedTag),
+      search: getNextPostTagFilter(tagName, clickedTag),
       replace: true, // Replace history to avoid back-button clutter
     });
   };
